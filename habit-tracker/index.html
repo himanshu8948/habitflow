@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HabitFlow Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="app-main">
+    <header class="page-header">
+      <div>
+        <h1 class="page-title" id="greeting">Good Morning</h1>
+        <p class="page-subtitle" id="todayDate"></p>
+      </div>
+      <a class="btn primary" href="add-habit.html">➕ Add Habit</a>
+    </header>
+
+    <section id="emptyState" class="empty-state" hidden>
+      <div class="empty-box">
+        <div class="empty-emoji">📭</div>
+        <h2>No habits yet. Add your first habit!</h2>
+        <a class="btn primary" href="add-habit.html">➕ Add Habit</a>
+      </div>
+    </section>
+
+    <section id="habitList" class="grid"></section>
+
+    <h2 class="section-title">Today's Overview</h2>
+    <section class="stats">
+      <div class="stat-pill">✅ <span id="completedCount">0</span> Completed today</div>
+      <div class="stat-pill">🔥 <span id="activeCount">0</span> Active streaks</div>
+      <div class="stat-pill">⚠️ <span id="missedCount">0</span> Missed today</div>
+    </section>
+  </main>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js');
+    }
+  </script>
+  <script src="app.js"></script>
+  <script>initDashboard();</script>
+</body>
+</html>

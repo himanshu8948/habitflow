@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Focus Timer</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="app-main">
+    <header class="page-header">
+      <div>
+        <h1 class="page-title" id="timerHabitName">Focus Timer</h1>
+        <p class="page-subtitle">Lock in today's focused session.</p>
+      </div>
+    </header>
+
+    <section id="timerPanel" class="timer-card card">
+      <div id="timerWarning" class="warning-banner" hidden></div>
+      <div class="timer-pills">
+        <span class="pill" id="timerCategory">Study</span>
+        <span class="pill" id="timerWindow">--</span>
+      </div>
+      <div class="countdown-wrap">
+        <svg class="countdown-ring" viewBox="0 0 260 260" role="img" aria-label="Countdown timer">
+          <circle class="countdown-bg" cx="130" cy="130" r="112"></circle>
+          <circle class="countdown-meter" id="countdownMeter" cx="130" cy="130" r="112"></circle>
+        </svg>
+        <div class="countdown-center">
+          <div id="timerDisplay">00:00</div>
+          <p><span id="timerTarget">0</span> min target</p>
+        </div>
+      </div>
+      <div class="timer-actions">
+        <button class="btn primary" id="startPauseBtn">▶ Start</button>
+        <button class="btn ghost" id="resetBtn">↺ Reset</button>
+        <button class="btn ghost" id="doneEarlyBtn">✓ Done Early</button>
+      </div>
+      <p class="elapsed-text">Elapsed: <span id="elapsedTime">00:00</span></p>
+    </section>
+  </main>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js');
+    }
+  </script>
+  <script src="app.js"></script>
+  <script>initTimer();</script>
+</body>
+</html>

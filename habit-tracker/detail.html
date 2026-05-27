@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Habit Detail</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="app-main">
+    <header class="page-header">
+      <div>
+        <h1 class="page-title" id="detailName">Habit Detail</h1>
+        <p class="page-subtitle">Track the streak and recent completion history.</p>
+      </div>
+      <span class="pill" id="detailCategory">Study</span>
+    </header>
+
+    <section id="detailPanel" class="detail-card card">
+      <div class="timer-meta">
+        <div class="meta-box"><span class="muted">Target</span><strong id="detailTarget">--</strong></div>
+        <div class="meta-box"><span class="muted">Window</span><strong id="detailWindow">--</strong></div>
+        <div class="meta-box"><span class="muted">Goal progress</span><strong id="detailStreak">--</strong></div>
+        <div class="meta-box"><span class="muted">Best streak</span><strong id="detailBest">--</strong></div>
+      </div>
+      <h2 class="section-title">Recent Days</h2>
+      <div class="calendar" id="calendar"></div>
+      <h2 class="section-title">Notes</h2>
+      <p class="muted" id="detailNotes"></p>
+      <div class="actions">
+        <a class="btn primary" id="startHabit" href="timer.html">Start Timer</a>
+        <a class="btn ghost" id="editHabit" href="add-habit.html">Edit</a>
+        <button class="btn danger" id="deleteHabit">Delete</button>
+      </div>
+    </section>
+  </main>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js');
+    }
+  </script>
+  <script src="app.js"></script>
+  <script>initDetail();</script>
+</body>
+</html>

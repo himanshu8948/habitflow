@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Add Habit</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="app-main">
+    <header class="page-header">
+      <div>
+        <h1 class="page-title" id="formTitle">Add New Habit</h1>
+        <p class="page-subtitle">Create a daily target with its own focus window.</p>
+      </div>
+    </header>
+
+    <form id="habitForm" class="form-card card" novalidate>
+      <div class="form-grid">
+        <div class="field full">
+          <label for="name">Habit Name</label>
+          <input id="name" name="name" type="text" maxlength="40" placeholder="e.g. Maths Practice">
+          <div class="field-meta"><span class="error-text" id="nameError"></span><span class="counter" id="nameCounter">0/40</span></div>
+        </div>
+
+        <div class="field full">
+          <label for="category">Category</label>
+          <div class="category-select-wrap">
+            <span class="category-dot" id="categoryDot"></span>
+            <select id="category" name="category">
+              <option>Study</option>
+              <option>Health</option>
+              <option>Fitness</option>
+              <option>Creative</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <span class="error-text" id="categoryError"></span>
+        </div>
+
+        <div class="field full">
+          <label>Color Tag</label>
+          <input id="color" name="color" type="hidden" value="#6C63FF">
+          <div class="swatches" id="colorSwatches">
+            <button type="button" class="swatch selected" style="--swatch-color:#6C63FF" data-color="#6C63FF" aria-label="Purple"></button>
+            <button type="button" class="swatch" style="--swatch-color:#22C55E" data-color="#22C55E" aria-label="Green"></button>
+            <button type="button" class="swatch" style="--swatch-color:#EF4444" data-color="#EF4444" aria-label="Red"></button>
+            <button type="button" class="swatch" style="--swatch-color:#F59E0B" data-color="#F59E0B" aria-label="Amber"></button>
+            <button type="button" class="swatch" style="--swatch-color:#06B6D4" data-color="#06B6D4" aria-label="Cyan"></button>
+            <button type="button" class="swatch" style="--swatch-color:#EC4899" data-color="#EC4899" aria-label="Pink"></button>
+            <button type="button" class="swatch" style="--swatch-color:#8B5CF6" data-color="#8B5CF6" aria-label="Violet"></button>
+            <button type="button" class="swatch" style="--swatch-color:#F97316" data-color="#F97316" aria-label="Orange"></button>
+          </div>
+          <span class="error-text" id="colorError"></span>
+        </div>
+
+        <div class="field full">
+          <label>Daily Target Duration</label>
+          <div class="split-row">
+            <input id="durationValue" name="durationValue" type="number" min="1" max="999">
+            <select id="durationUnit" name="durationUnit">
+              <option value="hours">Hours</option>
+              <option value="minutes">Minutes</option>
+            </select>
+          </div>
+          <span class="error-text" id="durationError"></span>
+        </div>
+
+        <div class="field full">
+          <label>When do you want to do this habit?</label>
+          <div class="split-row">
+            <input id="habitStart" name="habitStart" type="text" inputmode="numeric" maxlength="5" placeholder="03:00" aria-label="Start time">
+            <input id="habitEnd" name="habitEnd" type="text" inputmode="numeric" maxlength="5" placeholder="05:00" aria-label="End time">
+          </div>
+          <span class="error-text" id="timeError"></span>
+        </div>
+
+        <div class="field full">
+          <label for="streakGoalDays">Streak Goal</label>
+          <select id="streakGoalDays" name="streakGoalDays">
+            <option value="30">30 Days</option>
+            <option value="70">70 Days</option>
+            <option value="90">3 Months (90 Days)</option>
+            <option value="180">6 Months (180 Days)</option>
+            <option value="365">1 Year (365 Days)</option>
+          </select>
+          <span class="error-text" id="streakError"></span>
+        </div>
+
+        <div class="field full">
+          <label for="notes">Notes (optional)</label>
+          <textarea id="notes" name="notes" maxlength="200" rows="3" placeholder="Why is this habit important to you?"></textarea>
+          <div class="field-meta"><span class="error-text" id="notesError"></span><span class="counter" id="notesCounter">0/200</span></div>
+        </div>
+      </div>
+
+      <div class="form-footer">
+        <button class="btn primary full-width" type="submit">Save Habit</button>
+        <button class="btn danger full-width" type="button" id="deleteHabitForm" hidden>🗑 Delete Habit</button>
+        <a class="text-link" href="index.html">Cancel</a>
+      </div>
+    </form>
+  </main>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js');
+    }
+  </script>
+  <script src="app.js"></script>
+  <script>initHabitForm();</script>
+</body>
+</html>

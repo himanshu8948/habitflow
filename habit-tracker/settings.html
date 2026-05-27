@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Settings</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="app-main">
+    <div class="settings-shell">
+      <header class="page-header">
+        <div>
+          <h1 class="page-title">Settings</h1>
+          <p class="page-subtitle">Profile, notifications, and backup controls.</p>
+        </div>
+      </header>
+
+      <form id="settingsForm" class="settings-form" novalidate>
+        <section class="settings-section card">
+          <h2>Profile</h2>
+          <div class="field">
+            <label>Avatar</label>
+            <input id="avatar" name="avatar" type="hidden">
+            <div class="avatar-picker" id="avatarPicker">
+              <button type="button" class="avatar-option" data-avatar="🧑‍💻">🧑‍💻</button>
+              <button type="button" class="avatar-option" data-avatar="📚">📚</button>
+              <button type="button" class="avatar-option" data-avatar="🏃">🏃</button>
+              <button type="button" class="avatar-option" data-avatar="🎯">🎯</button>
+              <button type="button" class="avatar-option" data-avatar="🧘">🧘</button>
+              <button type="button" class="avatar-option" data-avatar="💪">💪</button>
+              <button type="button" class="avatar-option" data-avatar="🎨">🎨</button>
+              <button type="button" class="avatar-option" data-avatar="🎵">🎵</button>
+              <button type="button" class="avatar-option" data-avatar="🧬">🧬</button>
+              <button type="button" class="avatar-option" data-avatar="🔬">🔬</button>
+              <button type="button" class="avatar-option" data-avatar="🌱">🌱</button>
+              <button type="button" class="avatar-option" data-avatar="⚡">⚡</button>
+            </div>
+          </div>
+          <div class="field">
+            <label for="name">Name</label>
+            <input id="name" name="name" type="text" maxlength="30" placeholder="Your name">
+            <span class="error-text" id="settingsNameError"></span>
+          </div>
+        </section>
+
+        <section class="settings-section card">
+          <h2>Global Day Window</h2>
+          <p class="muted">Habits without a custom window follow this schedule.</p>
+          <div class="split-row">
+            <div class="field">
+              <label for="globalStart">Global Start</label>
+              <input id="globalStart" name="globalStart" type="text" inputmode="numeric" maxlength="5" placeholder="06:00">
+            </div>
+            <div class="field">
+              <label for="globalEnd">Global End</label>
+              <input id="globalEnd" name="globalEnd" type="text" inputmode="numeric" maxlength="5" placeholder="22:00">
+            </div>
+          </div>
+          <span class="error-text" id="settingsTimeError"></span>
+        </section>
+
+        <section class="settings-section card">
+          <h2>Notifications</h2>
+          <div class="toggle-row">
+            <span>⏰ Remind me 15 min before habit window closes</span>
+            <button type="button" class="toggle" id="notifyBefore" aria-pressed="false"><span></span></button>
+          </div>
+          <div class="toggle-row">
+            <span>🌅 Morning summary when I open the app</span>
+            <button type="button" class="toggle" id="notifyMorning" aria-pressed="false"><span></span></button>
+          </div>
+        </section>
+
+        <section class="settings-section card">
+          <h2>Data Management</h2>
+          <div class="data-actions">
+            <button type="button" class="btn ghost" id="exportData">📤 Export Data</button>
+            <button type="button" class="btn ghost" id="importData">📥 Import Data</button>
+            <input id="importFile" type="file" accept="application/json" hidden>
+          </div>
+          <p class="muted">⚠️ Importing data will overwrite everything currently saved.</p>
+        </section>
+
+        <section class="settings-section card">
+          <h2>Cloud Sync</h2>
+          <p class="muted" id="cloudStatus">Not signed in.</p>
+          <div class="field">
+            <label for="cloudEmail">Email</label>
+            <input id="cloudEmail" name="cloudEmail" type="email" autocomplete="email" placeholder="you@example.com">
+          </div>
+          <div class="field">
+            <label for="cloudPassword">Password</label>
+            <input id="cloudPassword" name="cloudPassword" type="password" autocomplete="current-password" placeholder="At least 6 characters">
+          </div>
+          <div class="data-actions">
+            <button type="button" class="btn primary" id="cloudLogin">Login</button>
+            <button type="button" class="btn ghost" id="cloudRegister">Register</button>
+            <button type="button" class="btn ghost" id="cloudPush">Upload Local Data</button>
+            <button type="button" class="btn ghost" id="cloudPull">Download Cloud Data</button>
+          </div>
+          <button type="button" class="text-link" id="cloudLogout">Sign out</button>
+        </section>
+
+        <section class="settings-section danger-zone card">
+          <h2>Danger Zone</h2>
+          <button type="button" class="btn danger full-width" id="clearAllData">🗑 Clear All Data</button>
+        </section>
+
+        <div class="settings-save">
+          <button class="btn primary full-width" type="submit">Save Settings</button>
+        </div>
+      </form>
+    </div>
+  </main>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js');
+    }
+  </script>
+  <script src="app.js"></script>
+  <script>initSettings();</script>
+</body>
+</html>
