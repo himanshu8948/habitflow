@@ -549,6 +549,8 @@ let activeHabit = null;
 let timerRunning = false;
 let timerDisabled = false;
 let ringCircumference = 0;
+let timerStartedAt = null;
+let baseElapsedSeconds = 0;
 
 function formatSeconds(seconds) {
   const mins = Math.floor(seconds / 60);
@@ -557,6 +559,9 @@ function formatSeconds(seconds) {
 }
 
 function paintTimer() {
+  if (timerRunning && timerStartedAt) {
+    elapsedSeconds = Math.min(totalSeconds, baseElapsedSeconds + Math.floor((Date.now() - timerStartedAt) / 1000));
+  }
   const remainingSeconds = Math.max(0, totalSeconds - elapsedSeconds);
   document.querySelector("#timerDisplay").textContent = formatSeconds(remainingSeconds);
   document.querySelector("#elapsedTime").textContent = formatSeconds(elapsedSeconds);
@@ -567,9 +572,14 @@ function paintTimer() {
 }
 
 function stopTimer() {
+  if (timerRunning && timerStartedAt) {
+    elapsedSeconds = Math.min(totalSeconds, baseElapsedSeconds + Math.floor((Date.now() - timerStartedAt) / 1000));
+  }
   clearInterval(timerInterval);
   timerInterval = null;
   timerRunning = false;
+  timerStartedAt = null;
+  baseElapsedSeconds = elapsedSeconds;
   const button = document.querySelector("#startPauseBtn");
   if (button && !timerDisabled) button.textContent = "▶ Start";
 }
@@ -616,9 +626,9 @@ function finishFullTimer() {
 function startTimer() {
   if (timerRunning || timerDisabled) return;
   timerRunning = true;
+  timerStartedAt = Date.now();
   document.querySelector("#startPauseBtn").textContent = "⏸ Pause";
   timerInterval = setInterval(() => {
-    elapsedSeconds += 1;
     paintTimer();
     if (totalSeconds - elapsedSeconds <= 0) finishFullTimer();
   }, 1000);
