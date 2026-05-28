@@ -552,6 +552,40 @@ let ringCircumference = 0;
 let timerStartedAt = null;
 let baseElapsedSeconds = 0;
 
+const TIMER_STATE_KEY = "ht_timer_state";
+
+function saveTimerState() {
+  if (!activeHabit) return;
+  const state = {
+    habitId: activeHabit.id,
+    date: getTodayString(),
+    elapsedSeconds,
+    baseElapsedSeconds,
+    timerRunning,
+    timerStartedAt
+  };
+  localStorage.setItem(TIMER_STATE_KEY, JSON.stringify(state));
+}
+
+function loadTimerState() {
+  const stored = localStorage.getItem(TIMER_STATE_KEY);
+  if (!stored) return null;
+  try {
+    const state = JSON.parse(stored);
+    if (state.habitId !== activeHabit?.id || state.date !== getTodayString()) {
+      localStorage.removeItem(TIMER_STATE_KEY);
+      return null;
+    }
+    return state;
+  } catch {
+    return null;
+  }
+}
+
+function clearTimerState() {
+  localStorage.removeItem(TIMER_STATE_KEY);
+}
+
 function formatSeconds(seconds) {
   const mins = Math.floor(seconds / 60);
   const secs = seconds % 60;
@@ -580,6 +614,7 @@ function stopTimer() {
   timerRunning = false;
   timerStartedAt = null;
   baseElapsedSeconds = elapsedSeconds;
+  saveTimerState();
   const button = document.querySelector("#startPauseBtn");
   if (button && !timerDisabled) button.textContent = "▶ Start";
 }
@@ -619,6 +654,7 @@ function showCelebration(habit) {
 
 function finishFullTimer() {
   stopTimer();
+  clearTimerState();
   document.querySelector("#countdownMeter").classList.add("done");
   completeHabit(activeHabit.id, activeHabit.targetMinutes, "done");
 }
@@ -627,6 +663,7 @@ function startTimer() {
   if (timerRunning || timerDisabled) return;
   timerRunning = true;
   timerStartedAt = Date.now();
+  saveTimerState();
   document.querySelector("#startPauseBtn").textContent = "⏸ Pause";
   timerInterval = setInterval(() => {
     paintTimer();
@@ -652,7 +689,18 @@ function initTimer() {
   }
 
   totalSeconds = activeHabit.targetMinutes * 60;
-  elapsedSeconds = 0;
+
+  const savedState = loadTimerState();
+  if (savedState) {
+    elapsedSeconds = savedState.elapsedSeconds;
+    baseElapsedSeconds = savedState.baseElapsedSeconds;
+    timerRunning = false;
+    timerStartedAt = null;
+  } else {
+    elapsedSeconds = 0;
+    baseElapsedSeconds = 0;
+  }
+
   const meter = document.querySelector("#countdownMeter");
   const radius = Number(meter.getAttribute("r"));
   ringCircumference = 2 * Math.PI * radius;
@@ -689,6 +737,8 @@ function initTimer() {
     openModal("Reset timer?", "This stops the timer and resets it to the full target duration.", () => {
       stopTimer();
       elapsedSeconds = 0;
+      baseElapsedSeconds = 0;
+      clearTimerState();
       document.querySelector("#countdownMeter").classList.remove("done");
       paintTimer();
     }, { confirmText: "Reset", confirmClass: "primary" });
@@ -698,6 +748,7 @@ function initTimer() {
     const elapsedMinutes = Math.floor(elapsedSeconds / 60);
     openModal(`You completed ${elapsedMinutes} of ${activeHabit.targetMinutes} minutes.`, "Mark as partial or cancel?", () => {
       stopTimer();
+      clearTimerState();
       completeHabit(activeHabit.id, elapsedMinutes, "partial");
       toast(`Logged ${elapsedMinutes} min for ${activeHabit.name}`);
     }, { confirmText: "Mark Partial", confirmClass: "primary" });
