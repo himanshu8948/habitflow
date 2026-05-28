@@ -931,3 +931,89 @@ textarea:focus {
     grid-template-columns: 1fr;
   }
 }
+
+.floating-timer {
+  position: fixed;
+  bottom: var(--space-5);
+  right: var(--space-5);
+  width: 280px;
+  z-index: 100;
+  max-width: none;
+  padding: var(--space-4);
+  margin: 0;
+}
+
+.floating-timer.top-left {
+  top: var(--space-5);
+  right: auto;
+  left: var(--space-5);
+  bottom: auto;
+}
+
+.floating-timer.top-right {
+  top: var(--space-5);
+  right: var(--space-5);
+  left: auto;
+  bottom: auto;
+}
+
+.floating-timer.bottom-left {
+  bottom: var(--space-5);
+  left: var(--space-5);
+  right: auto;
+  top: auto;
+}
+
+.floating-timer.bottom-right {
+  bottom: var(--space-5);
+  right: var(--space-5);
+  left: auto;
+  top: auto;
+}
+
+.floating-timer-handle {
+  cursor: grab;
+  user-select: none;
+  padding: var(--space-2) var(--space-3);
+  text-align: center;
+  color: var(--color-muted);
+  font-size: 12px;
+  font-weight: 800;
+  border-bottom: 1px solid var(--color-border);
+  margin: -4px -4px 8px -4px;
+  border-radius: var(--radius-2) var(--radius-2) 0 0;
+}
+
+.floating-timer-handle:active {
+  cursor: grabbing;
+}
+
+.floating-timer .countdown-wrap {
+  min-height: 120px;
+}
+
+.floating-timer .countdown-ring {
+  width: 100px;
+  height: 100px;
+}
+
+.floating-timer .timer-pills {
+  gap: 4px;
+  margin-bottom: var(--space-3);
+}
+
+.floating-timer .pill {
+  min-height: 24px;
+  padding: 0 var(--space-2);
+  font-size: 11px;
+}
+
+.floating-timer .timer-actions {
+  gap: var(--space-2);
+}
+
+.floating-timer .btn {
+  min-height: 36px;
+  padding: 0 var(--space-3);
+  font-size: 13px;
+}

@@ -551,6 +551,7 @@ let timerDisabled = false;
 let ringCircumference = 0;
 let timerStartedAt = null;
 let baseElapsedSeconds = 0;
+let absoluteSessionStartTime = null;
 
 const TIMER_STATE_KEY = "ht_timer_state";
 
@@ -560,9 +561,9 @@ function saveTimerState() {
     habitId: activeHabit.id,
     date: getTodayString(),
     elapsedSeconds,
-    baseElapsedSeconds,
     timerRunning,
-    timerStartedAt
+    absoluteSessionStartTime,
+    baseElapsedSeconds
   };
   localStorage.setItem(TIMER_STATE_KEY, JSON.stringify(state));
 }
@@ -582,6 +583,13 @@ function loadTimerState() {
   }
 }
 
+function calculateActualElapsedSeconds() {
+  if (!absoluteSessionStartTime) return elapsedSeconds;
+  const now = Date.now();
+  const startTime = new Date(absoluteSessionStartTime).getTime();
+  return Math.floor((now - startTime) / 1000);
+}
+
 function clearTimerState() {
   localStorage.removeItem(TIMER_STATE_KEY);
 }
@@ -593,8 +601,8 @@ function formatSeconds(seconds) {
 }
 
 function paintTimer() {
-  if (timerRunning && timerStartedAt) {
-    elapsedSeconds = Math.min(totalSeconds, baseElapsedSeconds + Math.floor((Date.now() - timerStartedAt) / 1000));
+  if (timerRunning && absoluteSessionStartTime) {
+    elapsedSeconds = Math.min(totalSeconds, calculateActualElapsedSeconds());
   }
   const remainingSeconds = Math.max(0, totalSeconds - elapsedSeconds);
   document.querySelector("#timerDisplay").textContent = formatSeconds(remainingSeconds);
@@ -606,14 +614,13 @@ function paintTimer() {
 }
 
 function stopTimer() {
-  if (timerRunning && timerStartedAt) {
-    elapsedSeconds = Math.min(totalSeconds, baseElapsedSeconds + Math.floor((Date.now() - timerStartedAt) / 1000));
+  if (timerRunning && absoluteSessionStartTime) {
+    elapsedSeconds = Math.min(totalSeconds, calculateActualElapsedSeconds());
   }
   clearInterval(timerInterval);
   timerInterval = null;
   timerRunning = false;
   timerStartedAt = null;
-  baseElapsedSeconds = elapsedSeconds;
   saveTimerState();
   const button = document.querySelector("#startPauseBtn");
   if (button && !timerDisabled) button.textContent = "▶ Start";
@@ -662,7 +669,9 @@ function finishFullTimer() {
 function startTimer() {
   if (timerRunning || timerDisabled) return;
   timerRunning = true;
-  timerStartedAt = Date.now();
+  if (!absoluteSessionStartTime) {
+    absoluteSessionStartTime = new Date().toISOString();
+  }
   saveTimerState();
   document.querySelector("#startPauseBtn").textContent = "⏸ Pause";
   timerInterval = setInterval(() => {
@@ -693,12 +702,15 @@ function initTimer() {
   const savedState = loadTimerState();
   if (savedState) {
     elapsedSeconds = savedState.elapsedSeconds;
-    baseElapsedSeconds = savedState.baseElapsedSeconds;
-    timerRunning = false;
-    timerStartedAt = null;
+    absoluteSessionStartTime = savedState.absoluteSessionStartTime;
+    timerRunning = savedState.timerRunning;
+    if (timerRunning && absoluteSessionStartTime) {
+      elapsedSeconds = calculateActualElapsedSeconds();
+    }
   } else {
     elapsedSeconds = 0;
-    baseElapsedSeconds = 0;
+    absoluteSessionStartTime = null;
+    timerRunning = false;
   }
 
   const meter = document.querySelector("#countdownMeter");
@@ -725,6 +737,14 @@ function initTimer() {
   }
   paintTimer();
 
+  if (timerRunning) {
+    document.querySelector("#startPauseBtn").textContent = "⏸ Pause";
+    timerInterval = setInterval(() => {
+      paintTimer();
+      if (totalSeconds - elapsedSeconds <= 0) finishFullTimer();
+    }, 1000);
+  }
+
   document.querySelector("#startPauseBtn").onclick = () => {
     if (timerRunning) {
       stopTimer();
@@ -737,7 +757,7 @@ function initTimer() {
     openModal("Reset timer?", "This stops the timer and resets it to the full target duration.", () => {
       stopTimer();
       elapsedSeconds = 0;
-      baseElapsedSeconds = 0;
+      absoluteSessionStartTime = null;
       clearTimerState();
       document.querySelector("#countdownMeter").classList.remove("done");
       paintTimer();
@@ -753,6 +773,64 @@ function initTimer() {
       toast(`Logged ${elapsedMinutes} min for ${activeHabit.name}`);
     }, { confirmText: "Mark Partial", confirmClass: "primary" });
   };
+
+  const floatingBtn = document.querySelector("#floatingModeBtn");
+  const timerPanel = document.querySelector("#timerPanel");
+  let isFloating = localStorage.getItem("timer_floating") === "true";
+
+  function updateFloatingMode() {
+    if (isFloating) {
+      document.body.style.overflow = "hidden";
+      timerPanel.classList.add("floating-timer", "bottom-right");
+      timerPanel.classList.remove("timer-card", "card");
+      floatingBtn.textContent = "⛅ Dock";
+      floatingBtn.title = "Return to normal view";
+      makeFloatingTimerDraggable();
+    } else {
+      document.body.style.overflow = "";
+      timerPanel.classList.remove("floating-timer", "bottom-right", "top-left", "top-right", "bottom-left");
+      timerPanel.classList.add("timer-card", "card");
+      floatingBtn.textContent = "⛅ Float";
+      floatingBtn.title = "Toggle floating mode";
+    }
+  }
+
+  function makeFloatingTimerDraggable() {
+    let offsetX = 0;
+    let offsetY = 0;
+    let isDown = false;
+
+    timerPanel.addEventListener("mousedown", (e) => {
+      if (e.target.closest("button") || e.target.closest("input")) return;
+      isDown = true;
+      const rect = timerPanel.getBoundingClientRect();
+      offsetX = e.clientX - rect.left;
+      offsetY = e.clientY - rect.top;
+    });
+
+    document.addEventListener("mousemove", (e) => {
+      if (!isDown) return;
+      timerPanel.style.position = "fixed";
+      timerPanel.style.left = (e.clientX - offsetX) + "px";
+      timerPanel.style.top = (e.clientY - offsetY) + "px";
+      timerPanel.style.bottom = "auto";
+      timerPanel.style.right = "auto";
+    });
+
+    document.addEventListener("mouseup", () => {
+      isDown = false;
+    });
+  }
+
+  floatingBtn.onclick = () => {
+    isFloating = !isFloating;
+    localStorage.setItem("timer_floating", String(isFloating));
+    updateFloatingMode();
+  };
+
+  if (isFloating) {
+    updateFloatingMode();
+  }
 }
 
 function initDetail() {
